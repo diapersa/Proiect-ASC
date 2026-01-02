@@ -1,11 +1,17 @@
+assume cs:code, ds:data
+
 public calculateWord
+public rotateByte
 
 data segment
     C dw ?
     sum dw ?
+    sirRotire db l dup(?)
+    N db ?
 data ends
 
 code segment
+
 calculateWord PROC
     ; in data segment in main
     ; si - inceputul sirului
@@ -70,4 +76,39 @@ repeta:
     ret
 calculateWord ENDP
 
+
+rotateByte PROC
+
+    mov di, offset sirRotire
+
+    repeta:
+        mov N, 0  
+
+        mov al, [si]    ; octet curent
+        mov bl, al
+        and bl, 00000001b   ; primul bit
+        shr al, 1
+        and al, 00000001b   ; al doilea bit
+        add al, bl
+
+        mov N, al   
+
+        mov al, [si]
+
+        push cx     ; salvam contorul
+        mov cl, N
+        rol al, cl   ; rotire spre stanga cu N pozitii
+        pop cx      ; restauram cx
+
+        mov [di], al
+
+        inc di
+        inc si
+
+        loop repeta
+        ret
+rotateByte ENDP
+
+
 code ends
+end
