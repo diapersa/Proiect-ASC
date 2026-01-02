@@ -48,8 +48,11 @@ calculateWord PROC
     mov dl, [si]    ; primul octet
     add sum, dx  
 
-    mov cx, l - 1 ; nr de octeti ramasi
     inc si
+
+    push cx ; salvam contorul original
+
+    sub cx, 1   ; primul octet a fost parcurs
 
 repeta:
     mov dh, 0
@@ -73,13 +76,17 @@ repeta:
     ; ax = ah:al -> C
     mov C, ax   ; salvam rez final
 
+    pop cx  ; restauram cx original
+
     ret
 calculateWord ENDP
 
 
 rotateByte PROC
+    ; cx deja contine lungimea sirului
 
     mov di, offset sirRotire
+    push cx
 
     repeta:
         mov N, 0  
@@ -106,7 +113,9 @@ rotateByte PROC
         inc si
 
         loop repeta
-        ret
+
+    pop cx
+    ret
 rotateByte ENDP
 
 
