@@ -1,6 +1,7 @@
 assume cs:code, ds:data
 
 public calculateWord
+public printWord
 public rotateByte
 public printBinary
 public printHex
@@ -13,6 +14,12 @@ data segment
     LinieNoua db 10, 13, '$'
     zece dw 10
     tabela db '0123456789ABCDEF'
+
+    mesajAfisBinar db 'Cuvantul C in binar: $'
+    mesajAfisHex db 'Cuvantul C in hex: $'
+
+    mesajAfisBinar db 'Sirul in binar este: $'
+    mesajAfisHex db 'Sirul in hex este: $'
 data ends
 
 code segment
@@ -86,6 +93,102 @@ repeta:
     ret
 calculateWord ENDP
 
+;print word C
+printWord PROC
+    ; afisare in binar a lui C + hexa
+
+    push cx     ; pastram contorul initial
+
+    ; 1) afisare in binar
+    ; afisare mesaj
+    mov ah, 09h
+    mov dx, offset mesajAfisBinar
+    int 21h
+
+    ; linie noua
+    mov ah, 09h
+    mov dx, offset LinieNoua
+    int 21h
+
+    mov bx, C
+    mov cx, 16  ; 16 deplasari spre stanga
+
+    repeatAfisC:
+        shl bx, 1
+        jc one
+
+        mov ah, 02h
+        mov dl, '0'
+        int 21h
+
+        loop repeatAfisC
+        jmp endPrint
+
+    one:
+        mov ah, 02h
+        mov dl, '1'
+        int 21h
+        loop repeatAfisC
+
+    endPrint:
+        mov ah, 09h
+        mov dx, offset LinieNoua
+        int 21h
+
+
+    ; 2) afisare in hex a lui C
+
+    ; linie noua
+    mov ah, 09h
+    mov dx, offset LinieNoua
+    int 21h
+
+    ; afisare mesaj
+    mov ah, 09h
+    mov dx, offset mesajAfisHex
+    int 21h
+
+    ; linie noua
+    mov ah, 09h
+    mov dx, offset LinieNoua
+    int 21h
+
+    mov ax, C
+    mov cx, 4   ; numarul de grupri de cate 4 biti ale cuv C
+
+    repeat16:
+        mov dx, 0
+        push cx
+
+        mov cx, 4   ; numar de biti care formeaza o cifra hexa
+
+        repeat4:
+            rol ax, 1
+            rcl dx, 1
+            loop repeat4
+        
+        pop cx
+        push ax
+
+        mov al, dl
+        mov bx, offset tabela
+        xlat tabela
+
+        mov dl, al
+        mov ah, 02h
+        int 21h
+
+        pop ax  ; restaurare valoare ax
+        loop repeat16
+        
+    ; linie noua
+    mov ah, 09h
+    mov dx, offset LinieNoua
+    int 21h
+
+    pop cx      ; restauram valoarea contorului original
+    ret
+printWord ENDP
 
 rotateByte PROC
     ; cx deja contine lungimea sirului
@@ -129,6 +232,16 @@ printBinary PROC
 
     mov si, offset sirRotire
 
+    ; afisare mesaj
+    mov ah, 09h
+    mov dx, offset mesajAfisBinar
+    int 21h
+
+    ; linie noua
+    mov ah, 09h ; functie afisare sir
+    mov dx, offset LinieNoua
+    int 21h
+
     repeat:
         mov bl, [si]    ; octet curent
         push cx
@@ -160,6 +273,12 @@ printBinary PROC
     loop printBinary
 
     pop cx
+
+    ; linie noua
+    mov ah, 09h ; functie afisare sir
+    mov dx, offset LinieNoua
+    int 21h
+
     ret
 printBinary ENDP
 
@@ -167,6 +286,16 @@ printBinary ENDP
 printHex PROC
     mov si, offset sirRotire
     push cx     ; salvam contorul original
+
+    ; afisare mesaj
+    mov ah, 09h
+    mov dx, offset mesajAfisHex
+    int 21h
+
+    ; linie noua
+    mov ah, 09h ; functie afisare sir
+    mov dx, offset LinieNoua
+    int 21h
 
     repeat:
         mov ah, [si]    ; octet curent
