@@ -63,6 +63,7 @@ calculateWord PROC
     inc si
 
     push cx ; salvam contorul original
+    push si ; salvam offset ul sirului original
 
     sub cx, 1   ; primul octet a fost parcurs
 
@@ -88,6 +89,7 @@ repeta:
     ; ax = ah:al -> C
     mov C, ax   ; salvam rez final
 
+    pop si  ; restauram si original
     pop cx  ; restauram cx original
 
     ret
@@ -194,7 +196,8 @@ rotateByte PROC
     ; cx deja contine lungimea sirului
 
     mov di, offset sirRotire
-    push cx
+    push cx     ; salvam contorul original
+    push si     ; offsetu-ul adresei sirului 
 
     repeta:
         mov N, 0  
@@ -222,6 +225,7 @@ rotateByte PROC
 
         loop repeta
 
+    pop si
     pop cx
     ret
 rotateByte ENDP
@@ -340,6 +344,22 @@ printHex PROC
     pop cx      ; restauram contorul original
     ret
 printHex ENDP
+
+;description
+functions PROC
+    ; apelam procedura pt calcularea cuvantului + afisarea lui in binar si hexa
+    call calculateWord
+    call printWord
+
+    ; rotirea sirului cu proprietatile corespunzatoare
+    call rotateByte
+
+    ; afisarea sirului rotit in binar si hexa
+    call printBinary
+    call printHex
+
+    ret
+functions ENDP
 
 code ends
 end
