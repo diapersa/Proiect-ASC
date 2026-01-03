@@ -10,6 +10,9 @@ data segment
     sum dw ?
     sirRotire db l dup(?)
     N db ?
+    LinieNoua db 10, 13, '$'
+    zece dw 10
+    tabela db '0123456789ABCDEF'
 data ends
 
 code segment
@@ -159,6 +162,55 @@ printBinary PROC
     pop cx
     ret
 printBinary ENDP
+
+
+printHex PROC
+    mov si, offset sirRotire
+    push cx     ; salvam contorul original
+
+    repeat:
+        mov ah, [si]    ; octet curent
+        push cx
+        mov cl, 2   ; numarul de grupuri de cate 4 biti ale byte-ului bl
+
+        repeat16:
+        mov dl, 0   ; folosim dl pt izolarea grupului de 4 biti
+        push cx
+
+        mov cx, 4   ; nr de biti ce formeaza o cifra hexa
+
+        repeat4:
+            rol ah, 1
+            rcl dl, 1
+            loop repeat4
+
+        pop cx  ; restauram cx pt bucla repeat16
+
+        push ax
+
+        mov al, dl
+        mov bx, offset tabela
+        xlat tabela
+
+        mov dl, al
+        mov ah, 02h
+        int 21h
+
+        pop ax
+        loop repeat16
+
+        newLine:
+            mov ah, 09h
+            mov dx, offset LinieNoua
+            int 21h
+
+        inc si
+        pop cx
+        loop repeat
+
+    pop cx      ; restauram contorul original
+    ret
+printHex ENDP
 
 code ends
 end
