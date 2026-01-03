@@ -2,6 +2,8 @@ assume cs:code, ds:data
 
 public calculateWord
 public rotateByte
+public printBinary
+public printHex
 
 data segment
     C dw ?
@@ -118,6 +120,45 @@ rotateByte PROC
     ret
 rotateByte ENDP
 
+
+printBinary PROC
+    push cx        ; salvam contorul original
+
+    mov si, offset sirRotire
+
+    repeat:
+        mov bl, [si]    ; octet curent
+        push cx
+        mov cl, 8       ; pt configuratia binara a unui octet - 8 biti
+
+    repeat2:
+        shl bl, 1
+        jc one  ; CF = 1 -> sare la eticheta one
+                ; CF = 0 -> afisam '0'
+        mov ah, 02h ; functie pt afisarea caracterelor
+        mov dl, '0' ; codul ascii al car. de afisat
+        int 21h     ; declanseaza afisarea car. 
+
+        loop repeat2
+        jmp endPrint
+    one:
+        mov ah, 02h
+        mov dl, '1'
+        int 21h
+        loop repeat2
+
+    endPrint:
+        mov ah, 09h ; functie afisare sir
+        mov dx, offset LinieNoua
+        int 21h
+
+    pop cx
+    inc si
+    loop printBinary
+
+    pop cx
+    ret
+printBinary ENDP
 
 code ends
 end
