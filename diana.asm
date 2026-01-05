@@ -1,5 +1,5 @@
 assume cs:code, ds:data
-
+ 
 public calculateWord
 public printWord
 public rotateByte
