@@ -17,21 +17,21 @@ data segment
            db 50 dup(?)   ; zona unde se vor stoca caracterele
 
     ; Vectorul unde vom stoca octetii convertiti din HEX in BINAR
-    ; Maxim 16 octeti conform cerinței
+    ; Maxim 16 octeti conform cerintei
     sirOcteti db 16 dup(?)
 
     ; Variabila in care memoram lungimea reala a sirului
-    ; (numărul de octeti introdusi)
+    ; (numarul de octeti introdusi)
     l db 0
 
 data ends
 
 ; PROCEDURI DEFINITE IN ALTE FISIERE 
-extern functions:proc                   
-extern sortare_sir:proc                 
-extern afisare_sir_sortat:proc
-extern calculare_numar_maxim_octetii1:proc
-extern afisare_octet_bit_1_maxim:proc
+extrn functions:proc                   
+extrn sortare_sir:proc                 
+extrn afisare_sir_sortat:proc
+extrn calculare_numar_maxim_octetii1:proc
+extrn afisare_octet_bit_1_maxim:proc
 
 
 ; SEGMENTUL DE COD
@@ -40,8 +40,8 @@ code segment
 ; PUNCTUL DE INTRARE AL PROGRAMULUI
 start:
 
-    ; Initializăm registrul DS cu adresa segmentului de date
-    ; Făra asta, nu putem accesa variabilele declarate in data segment
+    ; Initializam registrul DS cu adresa segmentului de date
+    ; Fara asta, nu putem accesa variabilele declarate in data segment
     mov ax, data
     mov ds, ax
 
@@ -51,9 +51,9 @@ start:
     int 21h                   ; apel intrerupere DOS
 
 
-    ; CITIREA DE LA TASTATURĂ
+    ; CITIREA DE LA TASTATURA
     ; Utilizatorul introduce valori HEX separate prin spatiu
-    mov ah, 0Ah               ; funcția DOS pentru citire cu buffer
+    mov ah, 0Ah               ; functia DOS pentru citire cu buffer
     mov dx, OFFSET buffer     ; DX = adresa bufferului
     int 21h                   ; DOS completeaza bufferul
 
@@ -95,10 +95,10 @@ convert:
     ; Convertim caracterul ASCII intr-o valoare 0..15
     call hexToNibble
 
-    ; Mutam valoarea pe bitii superiori (biții 7..4)
+    ; Mutam valoarea pe bitii superiori (bitii 7..4)
     shl al, 4
 
-    ; Salvam temporar rezultatul în AH
+    ; Salvam temporar rezultatul in AH
     mov ah, al
 
     ; Trecem la urmatorul caracter
@@ -109,7 +109,7 @@ convert:
     ; CONVERSIE AL DOILEA CARACTER HEX 
 
     mov al, [si]              ; citim al doilea caracter
-    call hexToNibble          ; il convertim în 0..15
+    call hexToNibble          ; il convertim in 0..15
 
     ; Combinam bitii superiori cu cei inferiori
     or ah, al
@@ -117,12 +117,12 @@ convert:
 
     ; SALVAREA OCTETULUI FINAL
 
-    mov [di], ah              ; salvam octetul în sirOcteti
-    inc di                    ; trecem la următoarea pozitie
+    mov [di], ah              ; salvam octetul in sirOcteti
+    inc di                    ; trecem la urmatoarea pozitie
     inc bx                    ; incrementam contorul de octeti
 
 
-; SARIM PESTE SPATII ȘI CONTINUAM
+; SARIM PESTE SPATII SI CONTINUAM
 
 skip:
     inc si
