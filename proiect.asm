@@ -9,6 +9,7 @@ public afisare_octet_bit_1_maxim
 data segment
 sir db 7,8,16,15,3
 lungime equ $-offset sir
+zece dw 10
 pozitie_octet db ?
 randNou db 13,10,'$'
 mesajSortat db 13,10,'Sirul sortat este : ',13,10,'$'
@@ -72,15 +73,37 @@ mov cx,lungime
 mov si,0
 repeta_afisare:
 ;--afisare octet--
-mov dl,sir[si]
-add dl,'0'
-mov ah ,02h
+push cx ;"inghetam" valoarea lui cx in stiva
+mov bl,sir[si]
+cmp bl,0
+jge pozitiv
+negativ:
+neg bl
+mov dl,'-'
+mov ah,02h
 int 21h
+pozitiv:
+mov al,bl
+mov ah,0
+mov cx,0
+Repeta10:
+mov dx,0
+div zece
+push dx 
+inc cx
+cmp ax,0
+jne Repeta10
+RepetaAfis:
+pop dx
+add dl,'0'
+mov ah,02h
+int 21h
+loop RepetaAfis
 ;--afisare spatiu--
 mov dl , ' '
 mov ah,02h
 int 21h
-
+pop cx ; recuperam valoarea initiala a lui cx
 inc si
 loop repeta_afisare
 
@@ -134,10 +157,31 @@ mov ah,09h
 mov dx, offset mesajOctetBiti1Maxim
 int 21h
 ;--afisam rezulatul--
-mov dl,nrMaxim_octetii1
-add dl,'0'
-mov ah ,02h
+mov bl,nrMaxim_octetii1
+cmp bl,0
+jge pozitiv1
+negativ1:
+neg bl
+mov dl,'-'
+mov ah,02h
 int 21h
+pozitiv1:
+mov al,bl
+mov ah,0
+mov cx,0
+Repeta10_:
+mov dx,0
+div zece
+push dx 
+inc cx
+cmp ax,0
+jne Repeta10_
+RepetaAfis1:
+pop dx
+add dl,'0'
+mov ah,02h
+int 21h
+loop RepetaAfis1
 ;--afisam rand nou--
 mov ah,09h
 mov dx,offset randNou
@@ -147,12 +191,29 @@ mov ah,09h
 mov dx, offset mesajPozitieMaxim
 int 21h
 ;--afisam rezulatul--
-mov dx,pozitie_numar_maxim_octetii1
-add dx,'0'
-mov ah ,02h
+mov bx,pozitie_numar_maxim_octetii1
+cmp bx,0
+jge pozitiv2
+negativ2:
+neg bx
+mov dl,'-'
+mov ah,02h
 int 21h
-
-
+pozitiv2:
+mov ax,bx
+mov cx,0
+RepetaImpartire:
+mov dx,0
+div zece
+push dx 
+inc cx
+cmp ax,0
+jne RepetaImpartire
+RepetaAfis2:
+pop dx
+add dl,'0'
+mov ah,02h
+int 21h
 
 ret 
 afisare_octet_bit_1_maxim ENDP
