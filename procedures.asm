@@ -5,11 +5,12 @@ public printWord
 public rotateByte
 public printBinary
 public printHex
+public functions
 
 data segment
     C dw ?
     sum dw ?
-    sirRotire db l dup(?)
+    sirRotire db 16 dup(?)
     N db ?
     LinieNoua db 10, 13, '$'
     zece dw 10
@@ -18,8 +19,8 @@ data segment
     mesajAfisBinar db 'Cuvantul C in binar: $'
     mesajAfisHex db 'Cuvantul C in hex: $'
 
-    mesajAfisBinar db 'Sirul in binar este: $'
-    mesajAfisHex db 'Sirul in hex este: $'
+    mesajAfisBinarSir db 'Sirul in binar este: $'
+    mesajAfisHexSir db 'Sirul in hex este: $'
 data ends
 
 code segment
@@ -41,7 +42,13 @@ calculateWord PROC
     and al, 00001111b   ; izolam bitii 0-3 
     mov bl, al  ; stocam bitii 0-3 
 
-    mov al, [si + l - 1]    ; ultimul byte
+    mov di, si          ; dx = offset ul sirului 
+    add di, cx            ; di = adresa finala
+    dec di              ; di = l-1
+    mov al, [di]   ; ultimul byte
+
+    ; mov al, [si + l - 1]    ; ultimul byte
+
     and al, 11110000b   ; bitii 4-7 
     shr al, 4   ; mutam in bitii 0-3
 
@@ -117,22 +124,22 @@ printWord PROC
 
     repeatAfisC:
         shl bx, 1
-        jc one
+        jc unu
 
         mov ah, 02h
         mov dl, '0'
         int 21h
 
         loop repeatAfisC
-        jmp endPrint
+        jmp endPrint1
 
-    one:
+    unu:
         mov ah, 02h
         mov dl, '1'
         int 21h
         loop repeatAfisC
 
-    endPrint:
+    endPrint1:
         mov ah, 09h
         mov dx, offset LinieNoua
         int 21h
@@ -199,7 +206,7 @@ rotateByte PROC
     push cx     ; salvam contorul original
     push si     ; offsetu-ul adresei sirului 
 
-    repeta:
+    repeta3:
         mov N, 0  
 
         mov al, [si]    ; octet curent
@@ -223,7 +230,7 @@ rotateByte PROC
         inc di
         inc si
 
-        loop repeta
+        loop repeta3
 
     pop si
     pop cx
@@ -238,7 +245,7 @@ printBinary PROC
 
     ; afisare mesaj
     mov ah, 09h
-    mov dx, offset mesajAfisBinar
+    mov dx, offset mesajAfisBinarSir
     int 21h
 
     ; linie noua
@@ -293,7 +300,7 @@ printHex PROC
 
     ; afisare mesaj
     mov ah, 09h
-    mov dx, offset mesajAfisHex
+    mov dx, offset mesajAfisHexSir
     int 21h
 
     ; linie noua
@@ -301,23 +308,23 @@ printHex PROC
     mov dx, offset LinieNoua
     int 21h
 
-    repeat:
+    repeatHex:
         mov ah, [si]    ; octet curent
         push cx
         mov cl, 2   ; numarul de grupuri de cate 4 biti ale byte-ului bl
 
-        repeat16:
+        repeat16_2:
         mov dl, 0   ; folosim dl pt izolarea grupului de 4 biti
         push cx
 
         mov cx, 4   ; nr de biti ce formeaza o cifra hexa
 
-        repeat4:
+        repeat4_2:
             rol ah, 1
             rcl dl, 1
-            loop repeat4
+            loop repeat4_2
 
-        pop cx  ; restauram cx pt bucla repeat16
+        pop cx  ; restauram cx pt bucla repeat16_2
 
         push ax
 
@@ -330,7 +337,7 @@ printHex PROC
         int 21h
 
         pop ax
-        loop repeat16
+        loop repeat16_2
 
         newLine:
             mov ah, 09h
@@ -339,7 +346,7 @@ printHex PROC
 
         inc si
         pop cx
-        loop repeat
+        loop repeatHex
 
     pop cx      ; restauram contorul original
     ret
