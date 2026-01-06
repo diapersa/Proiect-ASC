@@ -1,4 +1,4 @@
-assume cs:code, ds:data
+assume cs:code
  
 public calculateWord
 public printWord
@@ -7,21 +7,11 @@ public printBinary
 public printHex
 public functions
 
-data segment
-    C dw ?
-    sum dw ?
-    sirRotire db 16 dup(?)
-    N db ?
-    LinieNoua db 10, 13, '$'
-    zece dw 10
-    tabela db '0123456789ABCDEF'
 
-    mesajAfisBinar db 'Cuvantul C in binar: $'
-    mesajAfisHex db 'Cuvantul C in hex: $'
-
-    mesajAfisBinarSir db 'Sirul in binar este: $'
-    mesajAfisHexSir db 'Sirul in hex este: $'
-data ends
+extrn C:word, mesajAfisBinar:byte, mesajAfisHex:byte
+extrn LinieNoua:byte, tabela:byte
+extrn sum:word, sirRotire:byte, N:byte
+extrn mesajAfisBinarSir:byte, mesajAfisHexSir:byte
 
 code segment
 
@@ -32,12 +22,17 @@ calculateWord PROC
 
     mov C, 0    ; stocam rezultatul final
 
+    push ax
+    push bx
+    push dx
+
     xor ax, ax
     xor bx, bx
     xor dx, dx
 
     push cx ; salvam contorul original
     push si ; salvam offset ul sirului original
+    push di
     
     ; Pas 1: XOR intre primii 4 biti ai primului octet si ultimii 4 biti ai ultimului octet
 
@@ -96,8 +91,14 @@ repeta:
     ; ax = ah:al -> C
     mov C, ax   ; salvam rez final
 
+    pop di
     pop si  ; restauram si original
     pop cx  ; restauram cx original
+
+    ; restauram toti registrii 
+    pop dx
+    pop bx
+    pop ax
 
     ret
 calculateWord ENDP
@@ -107,6 +108,14 @@ printWord PROC
     ; afisare in binar a lui C + hexa
 
     push cx     ; pastram contorul initial
+    push ax
+    push bx
+    push dx
+
+    ; linie noua
+    mov ah, 09h
+    mov dx, offset LinieNoua
+    int 21h
 
     ; 1) afisare in binar
     ; afisare mesaj
@@ -195,12 +204,19 @@ printWord PROC
     mov dx, offset LinieNoua
     int 21h
 
+    pop dx
+    pop bx
+    pop ax
     pop cx      ; restauram valoarea contorului original
+
     ret
 printWord ENDP
 
 rotateByte PROC
     ; cx deja contine lungimea sirului
+    push di
+    push ax
+    push bx
 
     mov di, offset sirRotire
     push cx     ; salvam contorul original
@@ -234,6 +250,10 @@ rotateByte PROC
 
     pop si
     pop cx
+    pop bx
+    pop ax
+    pop di
+
     ret
 rotateByte ENDP
 
@@ -241,6 +261,9 @@ rotateByte ENDP
 printBinary PROC
     push si        ; salvam offset ul sirului 
     push cx        ; salvam contorul original
+    push ax
+    push bx
+    push dx
 
     mov si, offset sirRotire
 
@@ -282,8 +305,11 @@ printBinary PROC
 
     pop cx
     inc si
-    loop printBinary
+    loop repeat
 
+    pop dx
+    pop bx
+    pop ax
     pop cx
     pop si  ; restauram adresa originala a sirului
 
@@ -298,9 +324,12 @@ printBinary ENDP
 
 printHex PROC
     push si         ; salvam offset ul sirului
+    push cx         ; salvam contorul original
+    push ax
+    push bx
+    push dx
 
     mov si, offset sirRotire
-    push cx     ; salvam contorul original
 
     ; afisare mesaj
     mov ah, 09h
@@ -352,6 +381,9 @@ printHex PROC
         pop cx
         loop repeatHex
 
+    pop dx
+    pop bx
+    pop ax
     pop cx      ; restauram contorul original
     pop si      ; restauram offset ul sirului
     ret
