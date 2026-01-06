@@ -35,6 +35,9 @@ calculateWord PROC
     xor ax, ax
     xor bx, bx
     xor dx, dx
+
+    push cx ; salvam contorul original
+    push si ; salvam offset ul sirului original
     
     ; Pas 1: XOR intre primii 4 biti ai primului octet si ultimii 4 biti ai ultimului octet
 
@@ -68,9 +71,6 @@ calculateWord PROC
     add sum, dx  
 
     inc si
-
-    push cx ; salvam contorul original
-    push si ; salvam offset ul sirului original
 
     sub cx, 1   ; primul octet a fost parcurs
 
@@ -204,7 +204,7 @@ rotateByte PROC
 
     mov di, offset sirRotire
     push cx     ; salvam contorul original
-    push si     ; offsetu-ul adresei sirului 
+    push si     ; offset-ul adresei sirului 
 
     repeta3:
         mov N, 0  
@@ -239,6 +239,7 @@ rotateByte ENDP
 
 
 printBinary PROC
+    push si        ; salvam offset ul sirului 
     push cx        ; salvam contorul original
 
     mov si, offset sirRotire
@@ -284,6 +285,7 @@ printBinary PROC
     loop printBinary
 
     pop cx
+    pop si  ; restauram adresa originala a sirului
 
     ; linie noua
     mov ah, 09h ; functie afisare sir
@@ -295,6 +297,8 @@ printBinary ENDP
 
 
 printHex PROC
+    push si         ; salvam offset ul sirului
+
     mov si, offset sirRotire
     push cx     ; salvam contorul original
 
@@ -349,6 +353,7 @@ printHex PROC
         loop repeatHex
 
     pop cx      ; restauram contorul original
+    pop si      ; restauram offset ul sirului
     ret
 printHex ENDP
 
