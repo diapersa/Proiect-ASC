@@ -768,18 +768,7 @@ afisare_octet_bit_1_maxim PROC
 
     ;-- afisare octet (valoare) --
     mov al, nrMaxim_octetii1
-    cbw             ; Extinde AL la AX (semnat) pentru divizie
-    cmp ax, 0
-    jge afiseaza_pozitiv1
-    
-    push ax
-    mov dl, '-'
-    mov ah, 02h
-    int 21h
-    pop ax
-    neg ax
-
-afiseaza_pozitiv1:
+    xor ah, ah
     call Afisare_Numar_AX
 
     ;-- afisare rand nou --
