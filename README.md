@@ -1,10 +1,10 @@
 # Proiect-ASC
 
-##Descriere
+###Descriere
 
 Acest proiect face parte din cursul Arhitectura Sistemelor de Calcul (ASC) și este implementat în limbajul assembly. Scopul proiectului este de a demonstra abilitățile de programare la nivel scăzut, înțelegerea modului de funcționare al procesorului și a construcțiilor de cod la nivel de mașină.
 
-##Proiectul include:
+###Proiectul include:
 -cod sursă în Assembly (*.asm),
 -documentație detaliată a implementării,
 -diagramă reprezentând arhitectura / fluxul de execuție,
@@ -20,7 +20,7 @@ Acest proiect face parte din cursul Arhitectura Sistemelor de Calcul (ASC) și e
   - documentatie.pdf
   - diagrama.pdf
 
-##Fișiere cheie
+###Fișiere cheie
 -main.asm – Implementarea principală a programului.
 -brigitte.asm, diana.asm – Procedurile implementate individual.
 -documentatie.pdf – Documentația proiectului (descrierea cerințelor, designul).
