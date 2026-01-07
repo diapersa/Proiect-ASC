@@ -44,6 +44,7 @@ data segment
     mesajAfisHexSir db 'Sirul rotit in hex: $'
 
     ; STUDENT 3
+    lungime dw ?
     zece dw 10
     pozitie_octet db ?
     randNou db 13,10,'$'
@@ -144,7 +145,7 @@ convert:
     mov [di], ah              ; salvam octetul in sirOcteti
     inc di                    ; trecem la urmatoarea pozitie
     inc bx                    ; incrementam contorul de octeti
-    jmp convert
+    ; jmp convert
 
 
 ; SARIM PESTE SPATII SI CONTINUAM
@@ -177,11 +178,10 @@ done:
     call printBinary
     call printHex
 
-    
     call sortare_sir
     call afisare_sir_sortat
-    ; call calculare_numar_maxim_octetii1
-    ; call afisare_octet_bit_1_maxim
+    call calculare_numar_maxim_octetii1
+    call afisare_octet_bit_1_maxim
 
 
     ; TERMINAREA PROGRAMULUI
@@ -607,23 +607,22 @@ printHex ENDP
 
 sortare_sir Proc
 ;----- bubble sort -----
+    mov lungime,cx
     push ax
     push bx
     push cx
     push dx
     push si
-
-    mov cx, bx  ; salvam lungimea sirului
+    
+    mov cx, lungime  ; salvam lungimea sirului
+    dec cx ; facem n-1 parcurgeri
 repeta1:
-    mov ax,cx ;salvam pozitia curenta din sir
-    mov cx,lungime ; folosim cx pt al doilea loop , iteram de n-1 ori
-    dec cx  ;n=n-1
     mov si, offset sirOcteti
+    mov ax,cx ; salvam pozitia curenta
 repeta2:
     mov bl,[si]
     cmp bl,[si+1] ;comparam doua elemente 
     jnc next
-    mov bl,[si]
     mov dl,[si+1]
     mov [si],dl
     mov [si+1],bl
@@ -644,6 +643,8 @@ sortare_sir ENDP
 
 afisare_sir_sortat PROC
 ;----- afisarea sirului sortat -----
+    ;mov lungime,cx;salvam lungimea sirului 
+    mov lungime,cx
     push ax
     push bx
     push cx
@@ -657,24 +658,16 @@ afisare_sir_sortat PROC
     mov ah,09h
     mov dx, offset mesajSortat
     int 21h
-
-    mov cx,bx   ; salvam lungimea sirului
+    
+    mov cx,lungime
     mov si, offset sirOcteti    ; adresa de inceput a sirului
 repeta_afisare:
     ;--afisare octet--
     push cx ;"inghetam" valoarea lui cx in stiva
-    mov bl,[si]
-    cmp bl,0
-    jge pozitiv
-
-negativ:
-    neg bl
-    mov dl,'-'
-    mov ah,02h
-    int 21h
-
+ 
+   
 pozitiv:
-    mov al,bl
+    mov al,[si]
     mov ah,0
     mov cx,0
 
@@ -724,7 +717,7 @@ repeta_octeti:
 
     mov dx,cx ; retin pozitia curenta
     mov ax,0 ;aici stochez numarul de bitii 1
-    mov cx,16
+    mov cx,8
     mov bl,[si] ; octetul curent , il stochez in bl pt a nu-i schimba valoarea
 
 calculare1:
@@ -740,8 +733,10 @@ calculare1:
     jc next_ ; trecem mai departe , altfel actualizam maximul
     mov al,[si]
     mov nrMaxim_octetii1,al
-    mov pozitie_numar_maxim_octetii1,si
-
+    ; Calculam indexul: Index = SI - Offset sirOcteti
+    mov ax, si
+    sub ax, offset sirOcteti
+    mov pozitie_numar_maxim_octetii1, ax  
 next_:
     inc si
     mov cx,dx
@@ -756,100 +751,77 @@ next_:
     ret
 calculare_numar_maxim_octetii1 ENDP
 
-
 afisare_octet_bit_1_maxim PROC
     push ax
     push bx
     push cx
     push dx
-        
-    ;--afisam rand nou--
-    mov ah,09h
-    mov dx,offset randNou
+
+    ;-- afisare rand nou --
+    mov ah, 09h
+    mov dx, offset randNou
     int 21h
 
-    ;--afisam mesaj sugestiv--
-    mov ah,09h
+    ;-- afisare mesaj valoare --
     mov dx, offset mesajOctetBiti1Maxim
     int 21h
 
-    ;--afisam rezulatul--
-    mov bl,nrMaxim_octetii1
-    cmp bl,0
-    jge pozitiv1
+    ;-- afisare octet (valoare) --
+    mov al, nrMaxim_octetii1
+    cbw             ; Extinde AL la AX (semnat) pentru divizie
+    cmp ax, 0
+    jge afiseaza_pozitiv1
+    
+    push ax
+    mov dl, '-'
+    mov ah, 02h
+    int 21h
+    pop ax
+    neg ax
 
-negativ1:
-    neg bl
-    mov dl,'-'
-    mov ah,02h
+afiseaza_pozitiv1:
+    call Afisare_Numar_AX
+
+    ;-- afisare rand nou --
+    mov ah, 09h
+    mov dx, offset randNou
     int 21h
 
-pozitiv1:
-    mov al,bl
-    mov ah,0
-    mov cx,0
-
-Repeta10_:
-    mov dx,0
-    div zece
-    push dx 
-    inc cx
-    cmp ax,0
-    jne Repeta10_
-
-RepetaAfis1:
-    pop dx
-    add dl,'0'
-    mov ah,02h
-    int 21h
-    loop RepetaAfis1
-
-    ;--afisam rand nou--
-    mov ah,09h
-    mov dx,offset randNou
-    int 21h
-
-    ;--afisam mesaj sugestiv--
-    mov ah,09h
+    ;-- afisare mesaj pozitie --
     mov dx, offset mesajPozitieMaxim
     int 21h
 
-    ;--afisam rezulatul--
-    mov bx,pozitie_numar_maxim_octetii1
-    cmp bx,0
-    jge pozitiv2
-
-negativ2:
-    neg bx
-    mov dl,'-'
-    mov ah,02h
-    int 21h
-
-pozitiv2:
-    mov ax,bx
-    mov cx,0
-
-RepetaImpartire:
-    mov dx,0
-    div zece
-    push dx 
-    inc cx
-    cmp ax,0
-    jne RepetaImpartire
-
-RepetaAfis2:
-    pop dx
-    add dl,'0'
-    mov ah,02h
-    int 21h
+    ;-- afisare pozitie (offset-ul) --
+    mov ax, pozitie_numar_maxim_octetii1
+    call Afisare_Numar_AX
 
     pop dx
     pop cx
     pop bx
     pop ax
-
-    ret 
+    ret
 afisare_octet_bit_1_maxim ENDP
+
+;--- Subrutina pentru a evita duplicarea codului de afisare ---
+Afisare_Numar_AX PROC
+    mov cx, 0
+    mov bx, 10
+RepetaImpartire:
+    mov dx, 0
+    div bx          ; AX / 10, rest in DX
+    push dx
+    inc cx
+    cmp ax, 0
+    jne RepetaImpartire
+
+RepetaAfis3:
+    pop dx
+    add dl, '0'
+    mov ah, 02h
+    int 21h
+    loop RepetaAfis3
+    ret
+Afisare_Numar_AX ENDP
 
 code ends
 end start
