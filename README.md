@@ -1,10 +1,10 @@
 # Proiect-ASC
 
-###Descriere
+### Descriere
 
 Acest proiect face parte din cursul Arhitectura Sistemelor de Calcul (ASC) și este implementat în limbajul assembly. Scopul proiectului este de a demonstra abilitățile de programare la nivel scăzut, înțelegerea modului de funcționare al procesorului și a construcțiilor de cod la nivel de mașină.
 
-###Proiectul include:
+### Proiectul include:
 -cod sursă în Assembly (*.asm),
 -documentație detaliată a implementării,
 -diagramă reprezentând arhitectura / fluxul de execuție,
@@ -20,7 +20,7 @@ Acest proiect face parte din cursul Arhitectura Sistemelor de Calcul (ASC) și e
   - documentatie.pdf
   - diagrama.pdf
 
-###Fișiere cheie
+### Fișiere cheie
 -main.asm – Implementarea principală a programului.
 -brigitte.asm, diana.asm – Procedurile implementate individual.
 -documentatie.pdf – Documentația proiectului (descrierea cerințelor, designul).
@@ -47,7 +47,7 @@ Proiectul trebuie să îndeplinească următoarele cerințe:
 - **Manipularea șirului prin rotirea octeților**  
   Programul rotește octeții din șir folosind un număr `N` calculat anterior.
 
-##Despre Assembly
+## Despre Assembly
 Codul este scris în Assembly, un limbaj de programare de nivel scăzut, care permite control direct asupra instrucțiunilor procesorului. Pentru mai multe informații despre Assembly și modul de execuție a codului sursă, consultă cursurile sau resursele de referință pe arhitectura procesorului pentru care este scris codul.
 
 ## Cum se compilează și rulează
@@ -64,8 +64,8 @@ tlink /v main.obj    # Leagă obiectul pentru a crea fișierul executabil
 td main.exe          # Rulează programul
 ```
 
-##Contribuții
+## Contribuții
 Acest repository este un proiect de curs. Realizat de echipa DBB, din studentele Mranovatz Brigitte, Diana Persa si Bianca Nodis.
 
-Licență
+## Licență
 Proiectul este furnizat fără licență explicită (sau adaugă licența pe care o preferi cum ar fi MIT, GPL etc.).
